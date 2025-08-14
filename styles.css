@@ -1,0 +1,5 @@
+body { font-family: system-ui, sans-serif; margin: 24px; line-height: 1.6; }
+header { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+#projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 16px; }
+article { border: 1px solid #ddd; border-radius: 12px; padding: 12px; }
+a { color: #2563eb; text-decoration: none; }

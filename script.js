@@ -1,121 +1,202 @@
-// ----- Helpers -----
+// ---------- Helpers ----------
 const $ = (q, el = document) => el.querySelector(q);
 const $$ = (q, el = document) => [...el.querySelectorAll(q)];
 
-// Year
-$('#year').textContent = new Date().getFullYear();
+const yearEl = $('#year');
+if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// ----- Theme toggle -----
+// ---------- Theme toggle ----------
 const themeBtn = $('#theme-btn');
-const applyTheme = (t) => {
+function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
   localStorage.setItem('theme', t);
-  themeBtn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
-  themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
-};
-// Initialize from <html data-theme> set early in <head>
+  if (themeBtn) {
+    themeBtn.setAttribute('aria-pressed', String(t === 'dark'));
+    themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
+  }
+}
 applyTheme(document.documentElement.getAttribute('data-theme') || 'dark');
-
-themeBtn.addEventListener('click', () => {
+themeBtn?.addEventListener('click', () => {
   const cur = document.documentElement.getAttribute('data-theme') || 'dark';
   applyTheme(cur === 'dark' ? 'light' : 'dark');
 });
 
-// ----- Mobile nav -----
+// ---------- Mobile nav ----------
 const nav = $('#site-nav');
 const navToggle = $('.nav-toggle');
-navToggle.addEventListener('click', () => {
+navToggle?.addEventListener('click', () => {
   const isOpen = nav.classList.toggle('open');
   navToggle.setAttribute('aria-expanded', String(isOpen));
   navToggle.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
 });
+$$('#site-nav a').forEach(a => a.addEventListener('click', () => nav?.classList.remove('open')));
 
-// Close menu on link click (mobile)
-$$('#site-nav a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
-
-// Smooth scroll for in-page links
-$$('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', (e) => {
-    const id = a.getAttribute('href');
-    if (id.length > 1) {
-      e.preventDefault();
-      $(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+// ---------- Scroll progress bar ----------
+const bar = $('.scrollbar .bar');
+if (bar) {
+  addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+    bar.style.width = `${scrolled}%`;
   });
-});
+}
 
-// ----- Projects loader with graceful fallback -----
-const defaultProjects = [
+// ---------- Built-in project data (used if projects.json missing) ----------
+const BUILT_IN_PROJECTS = [
   {
-    title: "Deepfake Video Detector",
-    description: "Video-only deepfake detection pipeline with Streamlit UI and Grad-CAM.",
-    stack: ["PyTorch", "OpenCV", "Streamlit"],
-    image: "assets/proj1.png",
-    code: "https://github.com/pgk11",      // replace with repo
+    title: "PQC_Kyber",
+    description: "ML-KEM-512 key exchange over MQTT (ESP32 sim + Python client) with perf stats and shared secret exchange.",
+    stack: ["Python", "MQTT", "Kyber"],
+    image: "assets/pqc_kyber.png",
+    code: "https://github.com/pgk11/PQC_Kyber",     // update if different
     demo: "",
-    highlights: ["Frame extraction pipeline", "Explainability via Grad-CAM"]
+    highlights: ["IoT-ready flow", "Latency/RAM measurements"]
   },
   {
-    title: "Malware Classification from API Calls",
-    description: "Classifies files as benign/malicious using CNN, BiLSTM, and hybrid models.",
-    stack: ["TensorFlow", "Keras", "Pandas"],
-    image: "assets/proj2.png",
-    code: "https://github.com/pgk11",      // replace with repo
+    title: "Phishing detection using AI / NLP (DistilBERT)",
+    description: "Phishing classifier using DistilBERT with explainable outputs and robust preprocessing.",
+    stack: ["Python", "DistilBERT", "NLP"],
+    image: "assets/phishing_nlp.png",
+    code: "https://github.com/pgk11/Phishing-detection-using-DistilBERT",  // update if different
     demo: "",
-    highlights: ["F1 ~0.95 (example placeholder)", "ROC curves & confusion matrix"]
+    highlights: ["Transformer model", "Explainability hooks"]
   },
   {
-    title: "Post-Quantum MQTT Handshake (Kyber)",
-    description: "ML-KEM-512 key exchange over MQTT between ESP32 (sim) and Python client.",
-    stack: ["Python", "paho-mqtt", "pqcrypto"],
-    image: "assets/proj3.png",
-    code: "https://github.com/pgk11",      // replace with repo
+    title: "PG management website",
+    description: "Full-stack PG management portal with tenant onboarding, rent tracking, and admin analytics.",
+    stack: ["React", "Node", "PostgreSQL"],
+    image: "assets/pg_management.png",
+    code: "https://github.com/pgk11/PG-management-website",  // update if different
     demo: "",
-    highlights: ["Shared secret exchange", "Perf stats (RAM & latency)"]
+    highlights: ["Role-based access", "Receipts & reminders"]
+  },
+  {
+    title: "Stock prediction — candlestick pattern scanner",
+    description: "Pattern scanner + predictive signals dashboard using candlesticks; alerts for key formations.",
+    stack: ["Python", "Pandas", "TA"],
+    image: "assets/stock_candlestick.png",
+    code: "https://github.com/pgk11/Stock-prediction-using-candlestick-pattern-scanner", // update if different
+    demo: "",
+    highlights: ["Scanner + signals", "Alerting workflow"]
   }
 ];
 
+// Show total count on the hero (index only)
+const projectCountEl = $('#projectCount');
+if (projectCountEl) projectCountEl.textContent = String(BUILT_IN_PROJECTS.length);
+
+// ---------- Projects page / section logic ----------
+const state = { query: '', activeTags: new Set(), data: [] };
+
+const searchEl = $('#search');
+const filtersEl = $('#filters');
+const gridEl = $('#projects-grid');
+
+if (gridEl) {
+  // We are on a page that needs projects (projects.html or a section).
+  loadProjects().then(() => {
+    initFilters(state.data);
+    renderProjects(state.data);
+  });
+
+  searchEl?.addEventListener('input', (e) => {
+    state.query = e.target.value.toLowerCase();
+    renderProjects(state.data);
+  });
+}
+
 async function loadProjects() {
-  const grid = $('#projects-grid');
   try {
     const res = await fetch('projects.json', { cache: 'no-store' });
     const ok = res.ok && res.headers.get('content-type')?.includes('application/json');
-    const data = ok ? await res.json() : defaultProjects;
-    renderProjects(grid, data);
+    state.data = ok ? await res.json() : BUILT_IN_PROJECTS;
   } catch {
-    renderProjects(grid, defaultProjects);
+    state.data = BUILT_IN_PROJECTS;
   }
 }
 
-function renderProjects(grid, projects) {
-  grid.innerHTML = '';
+function initFilters(data) {
+  if (!filtersEl) return;
+  const tags = new Set(data.flatMap(p => p.stack || []));
+  filtersEl.innerHTML = '';
+
+  const allChip = makeChip('All', true);
+  filtersEl.appendChild(allChip);
+  [...tags].sort().forEach(tag => filtersEl.appendChild(makeChip(tag, false)));
+
+  function makeChip(label, pressed) {
+    const btn = document.createElement('button');
+    btn.className = 'filter-chip';
+    btn.type = 'button';
+    btn.textContent = label;
+    btn.setAttribute('aria-pressed', String(pressed));
+    btn.addEventListener('click', () => {
+      if (label === 'All') {
+        state.activeTags.clear();
+        [...filtersEl.children].forEach(c => c.setAttribute('aria-pressed', String(c === btn)));
+      } else {
+        const isOn = btn.getAttribute('aria-pressed') === 'true';
+        btn.setAttribute('aria-pressed', String(!isOn));
+        if (isOn) state.activeTags.delete(label); else state.activeTags.add(label);
+        filtersEl.firstElementChild.setAttribute('aria-pressed', String(state.activeTags.size === 0));
+      }
+      renderProjects(state.data);
+    });
+    return btn;
+  }
+}
+
+function renderProjects(projects) {
+  if (!gridEl) return;
+  const q = state.query;
+  const tags = state.activeTags;
+
+  const filtered = projects.filter(p => {
+    const hitText =
+      (p.title || '').toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q) ||
+      (p.stack || []).some(s => s.toLowerCase().includes(q));
+    const hitTags = tags.size === 0 || (p.stack || []).some(s => tags.has(s));
+    return hitText && hitTags;
+  });
+
+  gridEl.innerHTML = '';
   const frag = document.createDocumentFragment();
 
-  projects.forEach(p => {
+  filtered.forEach(p => {
     const card = document.createElement('article');
     card.className = 'card will-animate';
-
     card.innerHTML = `
+      <div class="glow"></div>
       <img src="${p.image || ''}" alt="${p.title || 'Project'} preview">
       <h3>${p.title || ''}</h3>
       <p>${p.description || ''}</p>
       <p class="stack">${(p.stack || []).join(' • ')}</p>
-      <div class="badges">
-        ${(p.highlights || []).map(h => `<span>${h}</span>`).join('')}
-      </div>
+      <div class="badges">${(p.highlights || []).map(h => `<span>${h}</span>`).join('')}</div>
       <div class="card-actions">
         ${p.demo ? `<a class="btn" href="${p.demo}" target="_blank" rel="noopener">Live</a>` : ''}
         ${p.code ? `<a class="btn ghost" href="${p.code}" target="_blank" rel="noopener">Code</a>` : ''}
       </div>
     `;
+    // Tilt / spotlight
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const rx = ((y / r.height) - 0.5) * -6;
+      const ry = ((x / r.width) - 0.5) * 6;
+      card.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(0)`;
+      card.style.setProperty('--mx', `${(x / r.width) * 100}%`);
+      card.style.setProperty('--my', `${(y / r.height) * 100}%`);
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+
     frag.appendChild(card);
   });
 
-  grid.appendChild(frag);
-  revealOnScroll($$('.will-animate', grid));
+  gridEl.appendChild(frag);
+  revealOnScroll($$('.will-animate', gridEl));
 }
 
-// Fancy reveal on scroll
 function revealOnScroll(items) {
   const obs = new IntersectionObserver((entries, o) => {
     entries.forEach(e => {
@@ -132,22 +213,17 @@ function revealOnScroll(items) {
   items.forEach(el => obs.observe(el));
 }
 
-loadProjects();
-
-// ----- Contact form (Formspree or gentle reminder) -----
+// ---------- Contact form ----------
 const form = $('#contact-form');
 const formStatus = $('#form-status');
-
 form?.addEventListener('submit', async (e) => {
   e.preventDefault();
-
   const action = form.getAttribute('action') || '';
   if (action.includes('yourformid')) {
     formStatus.textContent = 'Tip: Add your real Formspree endpoint in the form action.';
     formStatus.style.color = 'var(--warn)';
     return;
   }
-
   const data = new FormData(form);
   try {
     const res = await fetch(action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } });
@@ -165,12 +241,12 @@ form?.addEventListener('submit', async (e) => {
   }
 });
 
-// ----- Back to top button -----
+// ---------- Back to top ----------
 const toTop = $('#toTop');
 const toggleTop = () => {
-  if (window.scrollY > 300) toTop.classList.add('show');
-  else toTop.classList.remove('show');
+  if (window.scrollY > 300) toTop?.classList.add('show');
+  else toTop?.classList.remove('show');
 };
 toggleTop();
-window.addEventListener('scroll', toggleTop);
-toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+addEventListener('scroll', toggleTop);
+toTop?.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));

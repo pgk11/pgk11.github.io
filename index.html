@@ -4,14 +4,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Priyan Kotwal — Portfolio</title>
-  <meta name="description" content="Cybersecurity & ML projects by Priyan Kotwal — PQC Kyber, Phishing NLP, PG Management, and Stock Prediction." />
+  <meta name="description" content="Portfolio of Priyan Kotwal — Technology and Cybersecurity enthusiast." />
   <link rel="icon" href="assets/headshot.png" />
   <link rel="preload" href="styles.css" as="style" />
   <link rel="stylesheet" href="styles.css" />
 
   <!-- Social cards -->
   <meta property="og:title" content="Priyan Kotwal — Portfolio" />
-  <meta property="og:description" content="Selected projects, skills, and contact." />
+  <meta property="og:description" content="Technology and Cybersecurity enthusiast." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://pgk11.github.io/" />
   <meta property="og:image" content="https://pgk11.github.io/assets/headshot.png" />
@@ -34,7 +34,7 @@
 
   <header class="site-header">
     <div class="container nav-wrap">
-      <a class="brand" href="/">
+      <a class="brand" href="index.html">
         <span class="brand-mark" aria-hidden="true">◆</span>
         <span class="brand-text">Priyan Kotwal</span>
       </a>
@@ -50,7 +50,7 @@
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
         <a href="resume.pdf" target="_blank" rel="noopener">Résumé</a>
-        <a class="btn ghost small" href="https://www.linkedin.com/in/priyan-kotwal/" target="_blank" rel="noopener" aria-label="LinkedIn">LinkedIn</a>
+        <a class="btn ghost small" href="https://www.linkedin.com/in/priyan-kotwal/" target="_blank" rel="noopener">LinkedIn</a>
         <button id="theme-btn" class="btn ghost small" aria-pressed="false" title="Toggle theme">🌗</button>
       </nav>
     </div>
@@ -59,23 +59,14 @@
   <main id="main">
     <!-- HERO -->
     <section class="hero">
-      <div class="container hero-grid">
+      <div class="container hero-grid hero-content">
         <div class="hero-copy">
-          <h1>
-            Building <span class="grad-text">Security-first</span> systems
-            & ML apps that ship.
-          </h1>
+          <h1>Technology and Cybersecurity enthusiast.</h1>
           <p class="subtitle">Cybersecurity • ML for Security • Systems.</p>
           <div class="hero-cta">
             <a class="btn" href="projects.html">View Projects</a>
             <a class="btn ghost" href="https://github.com/pgk11" target="_blank" rel="noopener">GitHub</a>
-          </div>
-
-          <div class="marquee" aria-hidden="true">
-            <div class="marquee-track">
-              <span>Python</span><span>TensorFlow</span><span>PyTorch</span><span>FastAPI</span>
-              <span>React</span><span>Docker</span><span>PostgreSQL</span><span>ELK</span>
-            </div>
+            <a class="btn ghost" href="https://www.linkedin.com/in/priyan-kotwal/" target="_blank" rel="noopener">LinkedIn</a>
           </div>
         </div>
 
@@ -91,8 +82,10 @@
         </div>
       </div>
 
+      <!-- Background orbs (behind text) -->
       <div class="bg-orb orb-1" aria-hidden="true"></div>
       <div class="bg-orb orb-2" aria-hidden="true"></div>
+
       <svg class="hero-wave" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
         <path d="M0,64L60,80C120,96,240,128,360,138.7C480,149,600,139,720,122.7C840,107,960,85,1080,80C1200,75,1320,85,1380,90.7L1440,96L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"></path>
       </svg>
@@ -104,14 +97,9 @@
         <header class="section-head"><h2>About</h2></header>
         <div class="about-grid">
           <p>
-            I build practical security tools and machine-learning systems. Recent work includes a
-            post-quantum (Kyber) key exchange over MQTT for IoT devices, an NLP phishing detector using DistilBERT,
-            a full-stack PG management website, and a stock prediction app with a candlestick pattern scanner.
+            Hello, I'm Priyan Girish Kotwal, a cybersecurity expert. I completed my engineering in Electronics and Communications from VIT (Pune University). Meanwhile I joined RNS Technology Services as Security Analyst, where I handled the Security Operations for 3 of our clients each of different industry domains. Later I was software development engineer at Accenture and Tata Consultancy services for 2.5 years. In this journey, I got hands-on experience in various technologies like GCP Cloud, Devops, Agile methodology, Java, cybersecurity skills like SIEM, EDR, Incident Response, GRC, and penetration testing. After getting enough IT experience, I pursued Masters in Cybersecurity at NCI, Ireland, where I learnt advanced cybersecurity concepts and domains like computer forensics, malware analysis, cloud security, etc. My final project was Implementing Post Quantum Cryptographic algorithms in IoT communication. In this project I got hands-on learning of advanced cryptographic concepts and technologies.
           </p>
-          <ul class="chips" aria-label="Skills">
-            <li>Python</li><li>TensorFlow</li><li>PyTorch</li><li>FastAPI</li>
-            <li>React</li><li>Docker</li><li>PostgreSQL</li><li>ELK</li>
-          </ul>
+          <!-- (skills chips removed as requested) -->
         </div>
       </div>
     </section>
@@ -120,10 +108,10 @@
     <section id="contact" class="section">
       <div class="container">
         <header class="section-head"><h2>Contact</h2></header>
-        <p>Email: <a href="mailto:you@example.com">you@example.com</a></p>
+        <p>Email: <a href="mailto:priyan.kotwal@gmail.com">priyan.kotwal@gmail.com</a></p>
 
         <form id="contact-form" action="https://formspree.io/f/yourformid" method="POST" class="contact-form glass" novalidate>
-          <input type="text" name="_gotcha" class="visually-hidden" tabindex="-1" autocomplete="off" />
+          <!-- removed extra hidden input -->
           <label> Name
             <input name="name" autocomplete="name" required />
           </label>

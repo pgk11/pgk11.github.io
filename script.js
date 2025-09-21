@@ -41,14 +41,14 @@ if (bar) {
   });
 }
 
-// ---------- Built-in project data (used if projects.json missing) ----------
+// ---------- Built-in project data (fallback if no projects.json) ----------
 const BUILT_IN_PROJECTS = [
   {
     title: "PQC_Kyber",
     description: "ML-KEM-512 key exchange over MQTT (ESP32 sim + Python client) with perf stats and shared secret exchange.",
     stack: ["Python", "MQTT", "Kyber"],
     image: "assets/pqc_kyber.png",
-    code: "https://github.com/pgk11/PQC_Kyber",     // update if different
+    code: "https://github.com/pgk11/PQC_Kyber",
     demo: "",
     highlights: ["IoT-ready flow", "Latency/RAM measurements"]
   },
@@ -57,7 +57,7 @@ const BUILT_IN_PROJECTS = [
     description: "Phishing classifier using DistilBERT with explainable outputs and robust preprocessing.",
     stack: ["Python", "DistilBERT", "NLP"],
     image: "assets/phishing_nlp.png",
-    code: "https://github.com/pgk11/Phishing-detection-using-DistilBERT",  // update if different
+    code: "https://github.com/pgk11/Phishing-detection-using-DistilBERT",
     demo: "",
     highlights: ["Transformer model", "Explainability hooks"]
   },
@@ -66,7 +66,7 @@ const BUILT_IN_PROJECTS = [
     description: "Full-stack PG management portal with tenant onboarding, rent tracking, and admin analytics.",
     stack: ["React", "Node", "PostgreSQL"],
     image: "assets/pg_management.png",
-    code: "https://github.com/pgk11/PG-management-website",  // update if different
+    code: "https://github.com/pgk11/PG-management-website",
     demo: "",
     highlights: ["Role-based access", "Receipts & reminders"]
   },
@@ -75,7 +75,7 @@ const BUILT_IN_PROJECTS = [
     description: "Pattern scanner + predictive signals dashboard using candlesticks; alerts for key formations.",
     stack: ["Python", "Pandas", "TA"],
     image: "assets/stock_candlestick.png",
-    code: "https://github.com/pgk11/Stock-prediction-using-candlestick-pattern-scanner", // update if different
+    code: "https://github.com/pgk11/Stock-prediction-using-candlestick-pattern-scanner",
     demo: "",
     highlights: ["Scanner + signals", "Alerting workflow"]
   }
@@ -85,7 +85,7 @@ const BUILT_IN_PROJECTS = [
 const projectCountEl = $('#projectCount');
 if (projectCountEl) projectCountEl.textContent = String(BUILT_IN_PROJECTS.length);
 
-// ---------- Projects page / section logic ----------
+// ---------- Projects page logic ----------
 const state = { query: '', activeTags: new Set(), data: [] };
 
 const searchEl = $('#search');
@@ -93,7 +93,6 @@ const filtersEl = $('#filters');
 const gridEl = $('#projects-grid');
 
 if (gridEl) {
-  // We are on a page that needs projects (projects.html or a section).
   loadProjects().then(() => {
     initFilters(state.data);
     renderProjects(state.data);
@@ -220,7 +219,7 @@ form?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const action = form.getAttribute('action') || '';
   if (action.includes('yourformid')) {
-    formStatus.textContent = 'Tip: Add your real Formspree endpoint in the form action.';
+    formStatus.textContent = 'Tip: Replace the form action with your real Formspree endpoint.';
     formStatus.style.color = 'var(--warn)';
     return;
   }
